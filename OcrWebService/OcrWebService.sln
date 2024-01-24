@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34511.84
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OcrWebService", "OcrWebService\OcrWebService.csproj", "{D2411E1A-003B-4BE6-8516-6953AB00572A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D2411E1A-003B-4BE6-8516-6953AB00572A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2411E1A-003B-4BE6-8516-6953AB00572A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2411E1A-003B-4BE6-8516-6953AB00572A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2411E1A-003B-4BE6-8516-6953AB00572A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8FD030FB-B2E5-48CC-BE8A-5ECB093DD7F9}
+	EndGlobalSection
+EndGlobal
