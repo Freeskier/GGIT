@@ -9,6 +9,7 @@ nupkg/
 .vscode/
 
 # Rider
+.idea/
 OcrWebService/.idea/
 
 # Visual Studio
