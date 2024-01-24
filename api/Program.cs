@@ -11,7 +11,7 @@ var app = builder.Build();
 app.MapGet("/", async (KafkaProducer producer) =>
 {
     string message = DateTime.Now.ToString();
-    await producer.SendMessageAsync(message);
+    await producer.SendMessageAsync("ASD");
     return Results.Ok($"Sent message: {message}");
 });
 
