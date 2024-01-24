@@ -12,17 +12,17 @@ public class OcrService
     private readonly ILogger<OcrService> _logger;
     private readonly FileManagementService _fileManagemenet;
     private readonly DbFileContext _dbContext;
-    private readonly GiitMinio _giitMinio;
+    private readonly GgitMinio _ggitMinio;
 
     public OcrService(
         ILogger<OcrService> logger,
         FileManagementService fileManagemenet,
-        DbFileContext dbFileContext, GiitMinio giitMinio)
+        DbFileContext dbFileContext, GgitMinio ggitMinio)
     {
         _logger = logger;
         _fileManagemenet = fileManagemenet;
         _dbContext = dbFileContext;
-        _giitMinio = giitMinio;
+        _ggitMinio = ggitMinio;
     }
 
     //ACCEPTED EXTENSIONS TO OCR
@@ -44,8 +44,8 @@ public class OcrService
             OutputExtension = ocrResult.OutputExtension,
             Confidence = ocrResult.Confidence
         };
-        await _giitMinio.UploadFile(file.OpenReadStream(),
-            new GiitMinio.MinioUploadDto(ocrResult.BlobId.ToString(), null, "ggit"));
+        await _ggitMinio.UploadFile(file.OpenReadStream(),
+            new GgitMinio.MinioUploadDto(ocrResult.BlobId.ToString(), null, "ggit"));
         _fileManagemenet.CreateOutputFile(ocrResult.Text ?? string.Empty, ocrResultEntity);
         _dbContext.Add(ocrResultEntity);
         await _dbContext.SaveChangesAsync();

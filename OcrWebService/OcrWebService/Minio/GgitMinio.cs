@@ -1,16 +1,15 @@
 ﻿using Minio;
 using Minio.DataModel.Args;
 using Minio.DataModel.Response;
-using Minio.Exceptions;
 
 namespace OcrWebService.Minio;
 
-public class GiitMinio
+public class GgitMinio
 {
     private readonly IMinioClient _minio;
-    private readonly ILogger<GiitMinio> _logger;
+    private readonly ILogger<GgitMinio> _logger;
 
-    public GiitMinio(IMinioClient minio, ILogger<GiitMinio> logger)
+    public GgitMinio(IMinioClient minio, ILogger<GgitMinio> logger)
     {
         this._minio = minio;
         _logger = logger;

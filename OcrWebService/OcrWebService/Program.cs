@@ -17,7 +17,7 @@ builder.Services.AddDbContext<DbFileContext>();
 
 builder.Services.AddTransient<FileManagementService>();
 builder.Services.AddTransient<OcrService>();
-builder.Services.AddScoped<OcrWebService.Minio.GiitMinio>();
+builder.Services.AddScoped<OcrWebService.Minio.GgitMinio>();
 
 ///MINIO
 String endpoint = "localhost:9000";
