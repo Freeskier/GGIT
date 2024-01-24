@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Minio;
 using OcrWebService;
 using OcrWebService.Data;
 using OcrWebService.Services;
@@ -16,6 +17,17 @@ builder.Services.AddDbContext<DbFileContext>();
 
 builder.Services.AddTransient<FileManagementService>();
 builder.Services.AddTransient<OcrService>();
+builder.Services.AddScoped<OcrWebService.Minio.GiitMinio>();
+
+///MINIO
+String endpoint = "localhost:9000";
+String accessKey = "minio";
+String secretKey = "minio123";
+// Add Minio using the custom endpoint and configure additional settings for default MinioClient initialization
+builder.Services.AddMinio(configureClient => configureClient.WithSSL(false)
+    .WithEndpoint(endpoint)
+    .WithCredentials(accessKey, secretKey));
+///
 
 var app = builder.Build();
 
@@ -25,6 +37,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 app.UseHttpsRedirection();
 

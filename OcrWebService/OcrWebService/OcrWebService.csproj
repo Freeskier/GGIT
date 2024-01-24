@@ -16,6 +16,7 @@
 		</PackageReference>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.26" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
+		<PackageReference Include="Minio" Version="6.0.1" />
 		<PackageReference Include="PDFtoImage" Version="3.0.0" />
 		<PackageReference Include="SonarAnalyzer.CSharp" Version="9.17.0.82934">
 			<PrivateAssets>all</PrivateAssets>

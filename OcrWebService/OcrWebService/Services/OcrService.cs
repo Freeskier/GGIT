@@ -1,26 +1,28 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.EntityFrameworkCore;
-using OcrWebService.Data;
+﻿using OcrWebService.Data;
 using OcrWebService.Data.Entity;
 using OcrWebService.Data.Model;
 using System.Diagnostics;
+using OcrWebService.Minio;
 using Tesseract;
 
 namespace OcrWebService.Services;
+
 public class OcrService
 {
     private readonly ILogger<OcrService> _logger;
     private readonly FileManagementService _fileManagemenet;
     private readonly DbFileContext _dbContext;
+    private readonly GiitMinio _giitMinio;
 
     public OcrService(
         ILogger<OcrService> logger,
         FileManagementService fileManagemenet,
-        DbFileContext dbFileContext)
+        DbFileContext dbFileContext, GiitMinio giitMinio)
     {
         _logger = logger;
         _fileManagemenet = fileManagemenet;
         _dbContext = dbFileContext;
+        _giitMinio = giitMinio;
     }
 
     //ACCEPTED EXTENSIONS TO OCR
@@ -32,31 +34,20 @@ public class OcrService
 
     public async Task OcrFileFromUpload(IFormFile file)
     {
-        try
+        var ocrResult = OcrUploadedFile(file);
+        var ocrResultEntity = new OcrResultEntity
         {
-            var ocrResult = OcrUploadedFile(file);
-
-            var ocrResultEntity = new OcrResultEntity
-            {
-                BlobId = ocrResult.BlobId,
-                Content = ocrResult.Text,
-                InputExtension = ocrResult.InputExtension,
-                Name = file.FileName,
-                OutputExtension = ocrResult.OutputExtension,
-                Confidence = ocrResult.Confidence
-            };
-
-            _fileManagemenet.CreateOutputFile(ocrResult.Text ?? string.Empty, ocrResultEntity);
-            _dbContext.Add(ocrResultEntity);
-        }
-        catch (Exception e)
-        {
-            Trace.TraceError(e.ToString());
-            Console.WriteLine("Unexpected Error: " + e.Message);
-            Console.WriteLine("Details: ");
-            Console.WriteLine(e.ToString());
-        }
-
+            BlobId = ocrResult.BlobId,
+            Content = ocrResult.Text,
+            InputExtension = ocrResult.InputExtension,
+            Name = file.FileName,
+            OutputExtension = ocrResult.OutputExtension,
+            Confidence = ocrResult.Confidence
+        };
+        await _giitMinio.UploadFile(file.OpenReadStream(),
+            new GiitMinio.MinioUploadDto(ocrResult.BlobId.ToString(), null, "ggit"));
+        _fileManagemenet.CreateOutputFile(ocrResult.Text ?? string.Empty, ocrResultEntity);
+        _dbContext.Add(ocrResultEntity);
         await _dbContext.SaveChangesAsync();
     }
 
@@ -94,6 +85,7 @@ public class OcrService
                 Console.WriteLine(e.ToString());
             }
         }
+
         await _dbContext.SaveChangesAsync();
     }
 
@@ -108,7 +100,8 @@ public class OcrService
             file.CopyTo(ms);
             var fileBytes = ms.ToArray();
 
-            filePath = _fileManagemenet.SaveInputFileInOutputPath(file.FileName, blobId, fileBytes); //in OutputPath in order to have all files (input => output)
+            filePath = _fileManagemenet.SaveInputFileInOutputPath(file.FileName, blobId,
+                fileBytes); //in OutputPath in order to have all files (input => output)
         }
 
         if (!_acceptedExtensions.Exists(x => x.Equals(inputExtension)))
@@ -136,7 +129,6 @@ public class OcrService
             InputExtension = inputExtension,
             OutputExtension = Path.GetExtension(filePath)
         };
-
     }
 
     public OcrResult OcrResultIFilesInPath(string inputFilePath)
@@ -145,7 +137,8 @@ public class OcrService
         var inputExtension = Path.GetExtension(inputFilePath);
         var finalFilePath = inputFilePath;
 
-        _fileManagemenet.SaveInputFileInOutputPath(inputFilePath, blobId); //in OutputPath in order to have all files (input => output)
+        _fileManagemenet.SaveInputFileInOutputPath(inputFilePath,
+            blobId); //in OutputPath in order to have all files (input => output)
 
         _logger.LogInformation("File with '{extension}' is now being processed.", inputExtension);
 
