@@ -13,8 +13,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<DbFileContext>();
-
 builder.Services.AddTransient<FileManagementService>();
 builder.Services.AddTransient<OcrService>();
 builder.Services.AddScoped<OcrWebService.Minio.GgitMinio>();
@@ -28,6 +26,9 @@ builder.Services.AddMinio(configureClient => configureClient.WithSSL(false)
     .WithEndpoint(endpoint)
     .WithCredentials(accessKey, secretKey));
 ///
+var Configuration = builder.Configuration;
+builder.Services.AddDbContext<DbFileContext>(options =>
+    options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
@@ -37,7 +38,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 
 app.UseHttpsRedirection();
 

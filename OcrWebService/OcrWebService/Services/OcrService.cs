@@ -44,10 +44,9 @@ public class OcrService
             OutputExtension = ocrResult.OutputExtension,
             Confidence = ocrResult.Confidence
         };
-        await _ggitMinio.UploadFile(file.OpenReadStream(),
-            new GgitMinio.MinioUploadDto(ocrResult.BlobId.ToString(), null, "ggit"));
+        await _ggitMinio.UploadFile(file.OpenReadStream(), new GgitMinio.MinioUploadDto(ocrResult.BlobId.ToString() + ocrResult.InputExtension, null, "ggit"));
         _fileManagemenet.CreateOutputFile(ocrResult.Text ?? string.Empty, ocrResultEntity);
-        _dbContext.Add(ocrResultEntity);
+        _dbContext.OcrResults.Add(ocrResultEntity);
         await _dbContext.SaveChangesAsync();
     }
 
@@ -75,7 +74,7 @@ public class OcrService
                 };
 
                 _fileManagemenet.CreateOutputFile(ocrResult.Text ?? string.Empty, ocrResultEntity);
-                _dbContext.Add(ocrResultEntity);
+                _dbContext.OcrResults.Add(ocrResultEntity);
             }
             catch (Exception e)
             {
