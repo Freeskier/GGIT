@@ -6,27 +6,32 @@ kafka_topic = os.environ.get("KAFKA_TOPIC", "topic")
 es_host = os.environ.get('ELASTICSEARCH_HOST', 'elasticsearch')
 es_port = os.environ.get('ELASTICSEARCH_PORT', '9200')
 
-spark = SparkSession.builder.appName("KafkaToElasticsearch").getOrCreate()
 
+def main():
+    spark = SparkSession.builder \
+        .appName("KafkaToElasticsearchStream") \
+        .config("spark.es.nodes", es_host) \
+        .config("spark.es.port", es_port) \
+        .getOrCreate()
 
-df = spark \
-    .read \
-    .format("kafka") \
-    .option("kafka.bootstrap.servers", kafka_bootstrap_servers) \
-    .option("startingOffsets", "earliest") \
-    .option("endingOffsets", "latest") \
-    .option("subscribe", kafka_topic) \
-    .load()
+    df = spark.readStream \
+        .format("kafka") \
+        .option("kafka.bootstrap.servers", kafka_bootstrap_servers) \
+        .option("subscribe", kafka_topic) \
+        .option("startingOffsets", "latest") \
+        .option("auto.offset.reset", "latest") \
+        .load()
 
-df = df.selectExpr("CAST(value AS STRING)")
+    string_df = df.selectExpr("CAST(value AS STRING)")
 
+    query = string_df.writeStream \
+        .outputMode("append") \
+        .format("org.elasticsearch.spark.sql") \
+        .option("checkpointLocation", "/tmp") \
+        .option("es.resource", "your-index") \
+        .start()
 
-query = df.write \
-    .format("org.elasticsearch.spark.sql") \
-    .option("checkpointLocation", "/tmp") \
-    .option("es.nodes", es_host) \
-    .option("es.port", es_port) \
-    .option("es.resource", "logs-index") \
-    .save()
+    query.awaitTermination()
 
-spark.stop()
+if __name__ == "__main__":
+    main()
