@@ -20,7 +20,7 @@ public class KafkaProducer
         using var producer = new ProducerBuilder<Null, string>(config).Build();
         try
         {
-            var result = await producer.ProduceAsync(_topic, new Message<Null, string> { Value = message });
+            var result = await producer.ProduceAsync(_topic, new Message<Null, string> { Value = message, Timestamp = Timestamp.Default });
             Console.WriteLine($"Message '{message}' sent to {result.TopicPartitionOffset}");
         }
         catch (Exception e)

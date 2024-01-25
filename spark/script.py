@@ -1,5 +1,4 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col
 import os
 
 kafka_bootstrap_servers = os.environ.get("KAFKA_BOOTSTRAP_SERVERS", "kafka:29092")
@@ -9,24 +8,25 @@ es_port = os.environ.get('ELASTICSEARCH_PORT', '9200')
 
 spark = SparkSession.builder.appName("KafkaToElasticsearch").getOrCreate()
 
+
 df = spark \
-    .readStream \
+    .read \
     .format("kafka") \
     .option("kafka.bootstrap.servers", kafka_bootstrap_servers) \
+    .option("startingOffsets", "earliest") \
+    .option("endingOffsets", "latest") \
     .option("subscribe", kafka_topic) \
     .load()
 
-
 df = df.selectExpr("CAST(value AS STRING)")
 
-query = df.writeStream \
+
+query = df.write \
     .format("org.elasticsearch.spark.sql") \
-    .option("checkpointLocation", "/") \
+    .option("checkpointLocation", "/tmp") \
     .option("es.nodes", es_host) \
     .option("es.port", es_port) \
-    .option("es.resource", "logs-index/log-type") \
-    .start()
-
-query.awaitTermination()
+    .option("es.resource", "logs-index") \
+    .save()
 
 spark.stop()
