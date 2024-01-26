@@ -18,8 +18,7 @@ def main():
         .format("kafka") \
         .option("kafka.bootstrap.servers", kafka_bootstrap_servers) \
         .option("subscribe", kafka_topic) \
-        .option("startingOffsets", "latest") \
-        .option("auto.offset.reset", "latest") \
+        .option("startingOffsets", "earliest") \
         .load()
 
     string_df = df.selectExpr("CAST(value AS STRING)")
