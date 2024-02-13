@@ -1,0 +1,42 @@
+server:
+  port: "${SERVER_PORT:8081}"
+
+ogging:
+  file:
+    name: "logs/${spring.application.name}.log"
+  pattern:
+    file: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID}){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"
+  level:
+    "[org.springframework.beans.factory.annotation]": warn
+    "[org.springframework.context.annotation]": warn
+    "[org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod]": debug
+    "[org.hibernate.type.descriptor.sql]": ${ORG_HIBERNATE_TYPE_DESCRIPTOR_SQL:TRACE}"
+
+spring:
+  application:
+    name: brewa-webseller-document-creator
+  datasource:
+    url: "${DATABASE_URL:jdbc:postgresql://localhost:5432/postgres}"
+    username: "${DATABASE_USERNAME:postgres}"
+    password: "${DATABASE_PASSWORD:postgres}"
+  jpa:
+    hibernate:
+      #      TODO
+      ddl-auto: update
+    open-in-view: false
+    show-sql: "${DATABASE_SHOW_SQL:true}"
+    properties:
+      hibernate:
+        format_sql: "${DATABASE_SHOW_SQL:true}"
+        generate_statistics: "${DATABASE_SHOW_SQL:true}"
+        order_inserts: true
+        order_updates: true
+        jdbc:
+          batch_versioned_data: true
+          batch_size: 300
+
+minio:
+  access:
+    name: "${MINIO_ACCESS_NAME:minio}"
+    secret: "${MINIO_ACCESS_SECRET:minio123}"
+  url: "${MINIO_URL:http://localhost:9000}"
